@@ -1,5 +1,5 @@
 FROM vbkunin/itop:2.6.1-base
-MAINTAINER Vladimir Kunin <vladimir@knowitop.ru>
+MAINTAINER Itop tesis <bogota.1885@gmail.com>
 
 RUN apt-get update && apt-get install -y mariadb-server pwgen \
     && apt-get clean \
