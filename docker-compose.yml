@@ -1,0 +1,23 @@
+version: '3.5'
+
+services:
+  application:
+    image: changi67/itop-docker
+    ports:
+      - "80:8000"
+    links:
+      - mariadb
+  mariadb:
+      image: mariadb
+      restart: always
+      environment:
+        MYSQL_ROOT_PASSWORD: example
+      expose:
+        - "3306"
+      volumes:
+        - ./data:/data/db
+      networks: 
+        - backend
+networks:
+  backend:
+    driver: "bridge"
