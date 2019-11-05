@@ -30,6 +30,12 @@ Este es un repositorio de Git para la imagen de Docker con la herramienta de ges
         newgrp docker 
     4. Comando para verificar que podemos ejecutar  
        docker run hello-world
-  5. 
 
+# Ejecución de Docker itop
+   1. Descargar el repositorio: git clone git@github.com:SamuelAndresCo/itop-automation.git
+   2. Abrir la terminal de comandos y ejecutar el "docker build -t udistrital/itop ." Este comando ejecutara el archivo dockerfile y           creara la imagen llamada udistrital/itop. **El nombre udistrital/itop puede ser reemplazado por cualquier otro
+   3. Ejecutar el comando docker images ps y verificar que se liste la imagen udistrital/itop
+   4.
+   
+   
       
