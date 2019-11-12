@@ -1,23 +1,69 @@
 version: '3.5'
 
+# Use this file for an example for production
+
 services:
-  application:
-    image: changi67/itop-docker
-    ports:
-      - "80:8000"
-    links:
-      - mariadb
   mariadb:
-      image: mariadb
-      restart: always
-      environment:
-        MYSQL_ROOT_PASSWORD: example
-      expose:
-        - "3306"
-      volumes:
-        - ./data:/data/db
-      networks: 
-        - backend
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    stdin_open: true
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=itop
+      - MYSQL_USER=itop
+      - MYSQL_PASSWORD=itop
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./volumes/mariadb:/var/lib/mysql
+    networks:
+      - web
+  itop:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    stdin_open: true
+    environment:
+      - ITOP_DB_HOST=db
+      - ITOP_DB_NAME=itop
+      - ITOP_DB_USER=itop
+      - ITOP_DB_PASS=itop
+      - ITOP_DB_CONNECTION=mysql
+      - DB_CONNECTION=mysql
+      - ITOP_DB_PORT=3306
+      - DB_PORT=3306
+      - PHP_TIMEZONE="America/Bogota"
+      - PHP_ENABLE_UPLOADS="On"
+      - PHP_MEMORY_LIMIT="256M"
+      - PHP_POST_MAX_SIZE="10M"
+      - PHP_UPLOAD_MAX_FILESIZE="8M"
+      - PHP_MAX_FILE_UPLOADS="20"
+      - PHP_MAX_INPUT_TIME="300"
+      - PHP_LOG_ERRORS="On"
+      - PHP_ERROR_REPORTING="E_ALL" # Production Value: E_ALL & ~E_DEPRECATED & ~E_STRICT
+      - PMA_PORT=3306
+    links:
+      - mariadb:db
+    ports:
+      - "8080:80"
+    volumes:
+      - ./volumes/itop/config:/var/www/html/config
+    networks:
+      - web  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    stdin_open: true
+    links:
+      - mariadb:db
+    ports:
+      - "8000:80"
+    volumes:
+      - ./volumes/sessions:/sessions
+    networks:
+      - web
 networks:
-  backend:
-    driver: "bridge"
+  web:
+    driver: bridge
