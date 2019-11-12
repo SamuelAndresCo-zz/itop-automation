@@ -1,18 +1,89 @@
-FROM vbkunin/itop:2.6.1-base
-MAINTAINER Itop tesis <bogota.1885@gmail.com>
+##################################
+#=== Single stage with payload ===
+##################################
+FROM php:7.2-apache
 
-RUN apt-get update && apt-get install -y mariadb-server pwgen \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /var/lib/mysql/*
-    # Remove pre-installed database
+# install the PHP extensions we need
+RUN set -ex; \
+	savedAptMark="$(apt-mark showmanual)"; \
+	\
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		#For gd
+		libjpeg-dev \
+		libpng-dev \
+		#For Mcrypt
+		libmcrypt-dev \
+		#For LDAP
+		libldap2-dev \
+		#For XML
+		libxml2-dev \
+		#For CURL
+		libcurl3-dev \
+	; \
+	\
+	docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr; \
+	docker-php-ext-install -j "$(nproc)" \
+		gd \
+		mysqli \
+		zip \
+		xml \
+		curl \
+		soap \
+		ldap \
+	; \
+	\
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+	apt-mark auto '.*' > /dev/null; \
+	apt-mark manual $savedAptMark; \
+	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
+		| awk '/=>/ { print $3 }' \
+		| sort -u \
+		| xargs -r dpkg-query -S \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -rt apt-mark manual; \
+	\
+	pecl install apcu; \
+	pecl install mcrypt-1.0.1; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	apt-get install -y graphviz libmcrypt4 unzip; \
+	docker-php-ext-enable mcrypt apcu; \
+	rm -rf /var/lib/apt/lists/*
 
-COPY service /etc/service/
-COPY artifacts/scripts /
-COPY run.sh /run.sh
-RUN chmod +x -R /etc/service \
-    && chmod +x /*.sh
+#=== Set custom entrypoint ===
+COPY docker-entrypoint.sh /entrypoint
+RUN chmod +x /entrypoint
+ENTRYPOINT [ "/entrypoint" ]
 
-VOLUME /var/lib/mysql
+#=== Re-Set CMD as we changed the default entrypoint ===
+CMD [ "apache2-foreground" ]
 
-EXPOSE 3306
+# set recommended PHP.ini settings
+# see https://secure.php.net/manual/en/opcache.installation.php
+RUN { \
+		echo 'opcache.memory_consumption=128'; \
+		echo 'opcache.interned_strings_buffer=8'; \
+		echo 'opcache.max_accelerated_files=4000'; \
+		echo 'opcache.revalidate_freq=60'; \
+		echo 'opcache.fast_shutdown=1'; \
+		echo 'opcache.enable_cli=1'; \
+	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
+
+
+WORKDIR /var/www
+
+#
+ENV ITOP_VERSION 2.6.0
+ENV ITOP_VERSION_COMMIT 4294
+ENV ITOP_SHA256 6d8f15d5f960da6ecaa33079b9b713359ef86b46a2cff8253222ab008bac2508
+
+RUN curl -fSL "https://sourceforge.net/projects/itop/files/itop/${ITOP_VERSION}/iTop-${ITOP_VERSION}-${ITOP_VERSION_COMMIT}.zip/download" -o ${ITOP_VERSION}.zip \
+	&& echo "${ITOP_SHA256} *${ITOP_VERSION}.zip" | sha256sum -c - \
+	&& unzip ${ITOP_VERSION}.zip \
+	&& rm ${ITOP_VERSION}.zip \
+	&& rm -rf html \
+	&& mv web html \
+	&& chown -R www-data:www-data html
+
+# vim:set ft=dockerfile:
