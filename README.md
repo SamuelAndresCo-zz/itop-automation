@@ -33,9 +33,23 @@ Este es un repositorio de Git para la imagen de Docker con la herramienta de ges
 
 # Ejecución de Docker itop
    1. Descargar el repositorio: git clone git@github.com:SamuelAndresCo/itop-automation.git
-   2. Abrir la terminal de comandos y ejecutar el "docker build -t udistrital/itop ." Este comando ejecutara el archivo dockerfile y           creara la imagen llamada udistrital/itop. **El nombre udistrital/itop puede ser reemplazado por cualquier otro
-   3. Ejecutar el comando docker images ps y verificar que se liste la imagen udistrital/itop
-   4.
+   2. Abrir la terminal de comandos dentro de la carpeta descargada
+   3. Ejecutar el comando docker-compose build
+   4. Ejecutar el comando docker-compose up
+   5. Ir al navegador a la url http://localhost:8000/index.php, verificar que se ingrese a la consola de PHPmyAdmin
+   6. Ingresar usuario root o dev, ingresar contraseña root o dev. Dependiendo el rol con el que se quiera ingresar
+   7. Ir al navegador a la url http://localhost:8080/setup/index.php, verificar que se ingrese a la consola de Itop
+   8. Dar siguiente, aceptar terminos y condiciones, e ingresar los siguientes datos en el formulario de base de datos
+      MYSQL_HOST=mysql
+      MYSQL_DATABASE=test
+      MYSQL_ROOT_USER=root
+      MYSQL_ROOT_PASSWORD=root
+      MYSQL_USER=dev
+      MYSQL_PASSWORD=dev
+   9. Verificar que se habilite el botón "CONTINUAR" que indica que hay conexión entre ITOP y la base de datos.
+   
+   
+   
    
    
       
