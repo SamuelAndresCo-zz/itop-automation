@@ -47,6 +47,7 @@ Este es un repositorio de Git para la imagen de Docker con la herramienta de ges
       MYSQL_USER=dev
       MYSQL_PASSWORD=dev
    9. Verificar que se habilite el botón "CONTINUAR" que indica que hay conexión entre ITOP y la base de datos.
+   10. Continuar con el proceso.
    
    
    
