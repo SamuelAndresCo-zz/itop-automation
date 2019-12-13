@@ -37,21 +37,16 @@ Este es un repositorio de Git para la imagen de Docker con la herramienta de ges
    3. Ejecutar el comando docker-compose build
    4. Ejecutar el comando docker-compose up
    5. Ir al navegador a la url http://localhost:8080/setup/index.php, verificar que se ingrese a la consola de Itop
-   6. Dar siguiente, aceptar terminos y condiciones, e ingresar los siguientes datos en el formulario de base de datos
+   6. Clic botón "siguiente", aceptar checkbox de terminos y condiciones.
+   7. Ahora el sistema mostrara un formulario donde solicita los parametros de conexión a la base datos, dar los siguientes:
+   
       MYSQL_HOST=mysql
       MYSQL_DATABASE=test
-      
-      Se tienen dos usuarios, cualquiera de los dos se puede utilizar:
-      
-      - Usuario 1
-         MYSQL_ROOT_USER=root
-         MYSQL_ROOT_PASSWORD=root
-      - Usuario 2
-         MYSQL_USER=dev
-         MYSQL_PASSWORD=dev
+      MYSQL_ROOT_USER=root
+      MYSQL_ROOT_PASSWORD=root
    
-   7. Verificar que se habilite el botón "CONTINUAR" que indica que hay conexión entre ITOP y la base de datos.
-   8. Continuar con el proceso.
+   8. Verificar que se habilite el botón "CONTINUAR" que indica que hay conexión entre ITOP y la base de datos.
+   9. Continuar con el proceso.
    
    
    
